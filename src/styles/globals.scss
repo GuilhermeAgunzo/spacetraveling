@@ -4,4 +4,48 @@
   padding: 0;
 }
 
-// TODO
+:root {
+  --highlight-color: #ff57b2;
+  --heading-color: #f8f8f8;
+  --background-color: #1a1d23;
+  --info-color: #bbbbbb;
+  --body-color: #d7d7d7;
+}
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  background: var(--background-color);
+  color: var(--body-color);
+}
+
+body,
+input,
+button,
+textarea {
+  font: 400 1.6rem 'Inter', sans-serif;
+}
+
+@media screen and (max-width: 768px) {
+  html {
+    font-size: 50%;
+  }
+}
+
+@media screen and (max-width: 425px) {
+  html {
+    font-size: 45%;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  html {
+    font-size: 38%;
+  }
+}
+
+a {
+  text-decoration: none;
+}
