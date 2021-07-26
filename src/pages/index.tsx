@@ -1,5 +1,9 @@
+import { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+
+import { format } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR';
 
 import { FiCalendar, FiUser } from 'react-icons/fi';
 
@@ -31,7 +35,31 @@ interface HomeProps {
 }
 
 export default function Home({ postsPagination }: HomeProps): JSX.Element {
-  const posts = postsPagination.results;
+  const [nextPage, setNextPage] = useState<string | undefined>(
+    postsPagination.next_page
+  );
+  const [posts, setPosts] = useState<Post[]>(postsPagination.results);
+
+  function handleLoadMorePosts(): void {
+    fetch(nextPage)
+      .then(res => res.json())
+      .then(data => {
+        const newPosts = data.results.map(post => {
+          return {
+            uid: post.uid,
+            first_publication_date: post.first_publication_date,
+            data: {
+              title: post.data.title,
+              subtitle: post.data.subtitle,
+              author: post.data.author,
+            },
+          };
+        });
+
+        setNextPage(data.nextPage);
+        setPosts(posts.concat(newPosts));
+      });
+  }
 
   return (
     <>
@@ -50,18 +78,24 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
                 <div className={styles.info}>
                   <time>
                     <FiCalendar />
-                    {new Date(post.first_publication_date).toLocaleDateString(
-                      'pt-BR',
-                      { day: '2-digit', month: 'short', year: 'numeric' }
+                    {format(
+                      new Date(post.first_publication_date),
+                      'dd MMM yyyy',
+                      { locale: ptBR }
                     )}
                   </time>
                   <div className={styles.author}>
-                    <FiUser /> Guilherme Agunzo
+                    <FiUser /> {post.data.author}
                   </div>
                 </div>
               </a>
             </Link>
           ))}
+          {nextPage && (
+            <button type="button" onClick={() => handleLoadMorePosts()}>
+              Carregar mais posts
+            </button>
+          )}
         </div>
       </main>
     </>
@@ -74,7 +108,7 @@ export const getStaticProps: GetStaticProps = async () => {
     [Prismic.predicates.at('document.type', 'post')],
     {
       fetch: ['post.title', 'post.subtitle', 'post.author'],
-      pageSize: 5,
+      pageSize: 2,
     }
   );
 
