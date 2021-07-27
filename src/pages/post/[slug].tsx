@@ -130,6 +130,7 @@ export const getStaticProps: GetStaticProps = async context => {
   const response = (await prismic.getByUID('posts', String(slug), {})) as Post;
 
   const post = {
+    uid: 'como-utilizar-hooks',
     first_publication_date: response.first_publication_date,
     data: response.data,
   };
